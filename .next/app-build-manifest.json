@@ -15,6 +15,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/algorithms/sorting/page.js"
+    ],
+    "/algorithms/sorting/quiz/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/algorithms/sorting/quiz/page.js"
     ]
   }
 }
