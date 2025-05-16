@@ -82,7 +82,7 @@ export default function Home() {
             <span className="text-xl font-bold ">AlgoViz</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#sorting-algorithms" className="text-gray-300 hover:text-white transition-colors">Sorting Algorithms</a>
+            <a href="algorithms/sorting" className="text-gray-300 hover:text-white transition-colors">Sorting Algorithms</a>
           </nav>
         </div>
       </header>
