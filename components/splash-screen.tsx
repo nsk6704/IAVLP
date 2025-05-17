@@ -7,15 +7,38 @@ import Image from 'next/image';
 export default function SplashScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [skipSplash, setSkipSplash] = useState(false);
 
   useEffect(() => {
+    // Always show splash for 3 seconds, then redirect
     const timer = setTimeout(() => {
       setLoading(false);
       router.push('/home');
-    }, 3000); // 5 seconds
-
+    }, 3000); // 3 seconds
+    
     return () => clearTimeout(timer);
   }, [router]);
+
+  // Skip splash screen logic - for potential future use
+  useEffect(() => {
+    try {
+      // Try to check localStorage, but handle potential errors
+      const hasShownSplash = sessionStorage.getItem('hasShownSplash');
+      
+      if (hasShownSplash === 'true') {
+        setSkipSplash(true);
+        router.push('/home');
+      } else {
+        // Set the flag for future visits
+        sessionStorage.setItem('hasShownSplash', 'true');
+      }
+    } catch (error) {
+      // If localStorage is not available, just continue with splash
+      console.log('Session storage not available:', error);
+    }
+  }, [router]);
+
+  if (skipSplash) return null;
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-black z-50">
