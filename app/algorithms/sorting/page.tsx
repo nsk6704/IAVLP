@@ -20,6 +20,7 @@ export default function SortingVisualizer() {
   const [array, setArray] = useState<number[]>([]);
   const [arraySize, setArraySize] = useState<number>(50);
   const [speed, setSpeed] = useState<number>(50);
+  const speedRef = useRef<number>(50);
   const [algorithm, setAlgorithm] = useState<string>("bubble");
   const [isSorting, setIsSorting] = useState<boolean>(false);
   const [isSorted, setIsSorted] = useState<boolean>(false);
@@ -45,14 +46,19 @@ export default function SortingVisualizer() {
     generateArray();
   };
 
+  // Get animation speed based on the current speed value
+  const getAnimationSpeed = () => {
+    return Math.max(5, 505 - speedRef.current * 5);
+  };
+  
   // Start sorting
   const startSorting = async () => {
     if (isSorting || isSorted) return;
     
     setIsSorting(true);
     
-    // Calculate animation speed based on slider value (inverse relationship)
-    const animationSpeed = Math.max(5, 505 - speed * 5);
+    // Update the speed reference to current speed value
+    speedRef.current = speed;
     
     // Clone array to avoid direct mutations
     const arrayCopy = [...array];
@@ -60,22 +66,22 @@ export default function SortingVisualizer() {
     // Run the selected sorting algorithm
     switch (algorithm) {
       case 'bubble':
-        await bubbleSort(arrayCopy, animationSpeed, updateArrayState);
+        await bubbleSort(arrayCopy, getAnimationSpeed, updateArrayState);
         break;
       case 'insertion':
-        await insertionSort(arrayCopy, animationSpeed, updateArrayState);
+        await insertionSort(arrayCopy, getAnimationSpeed, updateArrayState);
         break;
       case 'selection':
-        await selectionSort(arrayCopy, animationSpeed, updateArrayState);
+        await selectionSort(arrayCopy, getAnimationSpeed, updateArrayState);
         break;
       case 'quick':
-        await quickSort(arrayCopy, 0, arrayCopy.length - 1, animationSpeed, updateArrayState);
+        await quickSort(arrayCopy, 0, arrayCopy.length - 1, getAnimationSpeed, updateArrayState);
         break;
       case 'heap':
-        await heapSort(arrayCopy, animationSpeed, updateArrayState);
+        await heapSort(arrayCopy, getAnimationSpeed, updateArrayState);
         break;
       case 'merge':
-        await mergeSort(arrayCopy, 0, arrayCopy.length - 1, animationSpeed, updateArrayState);
+        await mergeSort(arrayCopy, 0, arrayCopy.length - 1, getAnimationSpeed, updateArrayState);
         break;
       default:
         break;
@@ -187,8 +193,10 @@ export default function SortingVisualizer() {
                 min={1}
                 max={100}
                 step={1}
-                onValueChange={(value) => setSpeed(value[0])}
-                disabled={isSorting}
+                onValueChange={(value) => {
+                  setSpeed(value[0]);
+                  speedRef.current = value[0];
+                }}
                 className="py-2"
               />
             </div>

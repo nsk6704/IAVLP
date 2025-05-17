@@ -1,14 +1,14 @@
 // Heap sort implementation
 export async function heapSort(
   array: number[],
-  speed: number,
+  getSpeed: () => number,
   updateArrayState: (newArray: number[]) => void
 ): Promise<void> {
   const n = array.length;
   
   // Build max heap
   for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
-    await heapify(array, n, i, speed, updateArrayState);
+    await heapify(array, n, i, getSpeed, updateArrayState);
   }
   
   // Extract elements from heap one by one
@@ -18,10 +18,10 @@ export async function heapSort(
     
     // Update the array state and wait
     updateArrayState([...array]);
-    await new Promise(resolve => setTimeout(resolve, speed));
+    await new Promise(resolve => setTimeout(resolve, getSpeed()));
     
     // Call max heapify on the reduced heap
-    await heapify(array, i, 0, speed, updateArrayState);
+    await heapify(array, i, 0, getSpeed, updateArrayState);
   }
   
   return Promise.resolve();
@@ -32,7 +32,7 @@ async function heapify(
   array: number[],
   n: number,
   i: number,
-  speed: number,
+  getSpeed: () => number,
   updateArrayState: (newArray: number[]) => void
 ): Promise<void> {
   let largest = i; // Initialize largest as root
@@ -56,10 +56,10 @@ async function heapify(
     
     // Update the array state and wait
     updateArrayState([...array]);
-    await new Promise(resolve => setTimeout(resolve, speed));
+    await new Promise(resolve => setTimeout(resolve, getSpeed()));
     
     // Recursively heapify the affected sub-tree
-    await heapify(array, n, largest, speed, updateArrayState);
+    await heapify(array, n, largest, getSpeed, updateArrayState);
   }
   
   return Promise.resolve();

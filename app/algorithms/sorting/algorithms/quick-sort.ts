@@ -3,16 +3,16 @@ export async function quickSort(
   array: number[],
   low: number,
   high: number,
-  speed: number,
+  getSpeed: () => number,
   updateArrayState: (newArray: number[]) => void
 ): Promise<void> {
   if (low < high) {
     // Partition the array and get the pivot index
-    const pivotIndex = await partition(array, low, high, speed, updateArrayState);
+    const pivotIndex = await partition(array, low, high, getSpeed, updateArrayState);
     
     // Recursively sort the sub-arrays
-    await quickSort(array, low, pivotIndex - 1, speed, updateArrayState);
-    await quickSort(array, pivotIndex + 1, high, speed, updateArrayState);
+    await quickSort(array, low, pivotIndex - 1, getSpeed, updateArrayState);
+    await quickSort(array, pivotIndex + 1, high, getSpeed, updateArrayState);
   }
   
   return Promise.resolve();
@@ -23,7 +23,7 @@ async function partition(
   array: number[],
   low: number,
   high: number,
-  speed: number,
+  getSpeed: () => number,
   updateArrayState: (newArray: number[]) => void
 ): Promise<number> {
   // Choose the rightmost element as pivot
@@ -42,7 +42,7 @@ async function partition(
       
       // Update the array state and wait
       updateArrayState([...array]);
-      await new Promise(resolve => setTimeout(resolve, speed));
+      await new Promise(resolve => setTimeout(resolve, getSpeed()));
     }
   }
   
@@ -51,7 +51,7 @@ async function partition(
   
   // Update the array state and wait
   updateArrayState([...array]);
-  await new Promise(resolve => setTimeout(resolve, speed));
+  await new Promise(resolve => setTimeout(resolve, getSpeed()));
   
   return i + 1;
 }

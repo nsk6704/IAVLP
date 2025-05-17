@@ -3,7 +3,7 @@ export async function mergeSort(
   array: number[],
   start: number,
   end: number,
-  speed: number,
+  getSpeed: () => number,
   updateArrayState: (newArray: number[]) => void
 ): Promise<void> {
   if (start < end) {
@@ -11,11 +11,11 @@ export async function mergeSort(
     const mid = Math.floor((start + end) / 2);
     
     // Sort first and second halves
-    await mergeSort(array, start, mid, speed, updateArrayState);
-    await mergeSort(array, mid + 1, end, speed, updateArrayState);
+    await mergeSort(array, start, mid, getSpeed, updateArrayState);
+    await mergeSort(array, mid + 1, end, getSpeed, updateArrayState);
     
     // Merge the sorted halves
-    await merge(array, start, mid, end, speed, updateArrayState);
+    await merge(array, start, mid, end, getSpeed, updateArrayState);
   }
   
   return Promise.resolve();
@@ -27,7 +27,7 @@ async function merge(
   start: number,
   mid: number,
   end: number,
-  speed: number,
+  getSpeed: () => number,
   updateArrayState: (newArray: number[]) => void
 ): Promise<void> {
   // Create temporary arrays
@@ -61,7 +61,7 @@ async function merge(
     
     // Update the array state and wait
     updateArrayState([...array]);
-    await new Promise(resolve => setTimeout(resolve, speed));
+    await new Promise(resolve => setTimeout(resolve, getSpeed()));
     
     k++;
   }
@@ -74,7 +74,7 @@ async function merge(
     
     // Update the array state and wait
     updateArrayState([...array]);
-    await new Promise(resolve => setTimeout(resolve, speed));
+    await new Promise(resolve => setTimeout(resolve, getSpeed()));
   }
   
   // Copy the remaining elements of rightArray, if any
@@ -85,7 +85,7 @@ async function merge(
     
     // Update the array state and wait
     updateArrayState([...array]);
-    await new Promise(resolve => setTimeout(resolve, speed));
+    await new Promise(resolve => setTimeout(resolve, getSpeed()));
   }
   
   return Promise.resolve();

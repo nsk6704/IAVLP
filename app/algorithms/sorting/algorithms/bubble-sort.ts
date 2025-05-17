@@ -1,7 +1,7 @@
 // Bubble sort implementation
 export async function bubbleSort(
   array: number[],
-  speed: number,
+  getSpeed: () => number,
   updateArrayState: (newArray: number[]) => void
 ): Promise<void> {
   const n = array.length;
@@ -15,7 +15,7 @@ export async function bubbleSort(
         
         // Update the array state and wait
         updateArrayState([...array]);
-        await new Promise(resolve => setTimeout(resolve, speed));
+        await new Promise(resolve => setTimeout(resolve, getSpeed()));
       }
     }
   }
