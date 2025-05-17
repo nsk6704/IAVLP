@@ -162,13 +162,13 @@ export default function SortingVisualizer() {
                 <SelectTrigger className="bg-black/50 border-white/20">
                   <SelectValue placeholder="Select Algorithm" />
                 </SelectTrigger>
-                <SelectContent className="bg-white/90 border-white/20">
-                  <SelectItem value="bubble">Bubble Sort</SelectItem>
-                  <SelectItem value="insertion">Insertion Sort</SelectItem>
-                  <SelectItem value="selection">Selection Sort</SelectItem>
-                  <SelectItem value="merge">Merge Sort</SelectItem>
-                  <SelectItem value="quick">Quick Sort</SelectItem>
-                  <SelectItem value="heap">Heap Sort</SelectItem>
+                <SelectContent className="bg-black/90 border-white/20">
+                  <SelectItem value="bubble" className="text-white">Bubble Sort</SelectItem>
+                  <SelectItem value="insertion" className="text-white">Insertion Sort</SelectItem>
+                  <SelectItem value="selection" className="text-white">Selection Sort</SelectItem>
+                  <SelectItem value="merge" className="text-white">Merge Sort</SelectItem>
+                  <SelectItem value="quick" className="text-white">Quick Sort</SelectItem>
+                  <SelectItem value="heap" className="text-white">Heap Sort</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -236,7 +236,7 @@ export default function SortingVisualizer() {
             {array.map((value, idx) => (
               <div
                 key={idx}
-                className="array-bar mx-[1px] bg-gradient-to-t from-purple-500 to-blue-500 rounded-t-sm"
+                className="array-bar mx-[2.5px] bg-gradient-to-t from-purple-500 to-blue-500 rounded-t-sm"
                 style={{
                   height: `${value * 3.5}px`,
                   width: `${Math.max(2, 100 / arraySize - 1)}px`,
