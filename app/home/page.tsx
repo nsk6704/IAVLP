@@ -66,7 +66,8 @@ const algorithms: AlgorithmCategory[] = [
     category: "Sorting Algorithms",
     icon: <GitGraph className="w-6 h-6" />,
     items: [
-      { name: "Sorting Visualizer", id: "sorting", description: "Interactive visualization of popular sorting algorithms with customizable parameters" }
+      { name: "Sorting Visualizer", id: "sorting", description: "Interactive visualization of popular sorting algorithms with customizable parameters" },
+      { name: "Complexity Analyzer", id: "sorting/complexity", description: "Analyze time and space complexity of sorting algorithms with detailed explanations" }
     ]
   }
 ];
@@ -83,6 +84,8 @@ const AlgorithmCard = ({ title, description, icon, id, category }: AlgorithmCard
   let linkPath = `/algorithms/${id}`;
   if (category === "Theory of Computation") {
     linkPath = `/theory-of-computation/${id}`;
+  } else if (category === "Code Analysis") {
+    linkPath = `/${id}`;
   }
   
   return (

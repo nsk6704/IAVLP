@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RefreshCw, Play, GitGraph } from "lucide-react";
+import { RefreshCw, Play, GitGraph, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -124,18 +124,23 @@ export default function SortingVisualizer() {
       {/* Header */}
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-black/50 backdrop-blur-xl shadow-lg" : ""
+        scrolled ? "bg-gray-950/80 backdrop-blur-lg shadow-lg" : ""
       )}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <GitGraph className="w-8 h-8 text-purple-500" />
-            <span className="text-xl font-bold">AlgoViz</span>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-              Home
+            <Link href="/home" className="flex items-center gap-2 hover:text-blue-400 transition-colors">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="font-semibold">Back to Home</span>
             </Link>
-          </nav>
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold">Sorting Visualizer</h1>
+          </div>
+          <div className="flex items-center">
+            <Link href="/algorithms/sorting/complexity" className="text-sm hover:text-blue-400 transition-colors">
+              <span className="font-semibold">Complexity Analyzer</span>
+            </Link>
+          </div>
         </div>
       </header>
 
