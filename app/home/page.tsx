@@ -50,7 +50,7 @@ const algorithms: AlgorithmCategory[] = [
     category: "Graph Shortest Path",
     icon: <Network className="w-6 h-6" />,
     items: [
-      { name: "Dijkstra's Algorithm", id: "dijkstra", description: "Shortest path finding in weighted graphs with uniform cost search" },
+      { name: "Dijkstra's Algorithm", id: "dijkstra", description: "Shortest path finding in graphs with uniform cost search" },
       { name: "A* Pathfinding", id: "astar_shortest_path", description: "Efficient pathfinding using heuristic-based search" },
       { name: "DFS Traversal", id: "dfs", description: "Depth-first search traversal and path finding in graphs" }
     ]
