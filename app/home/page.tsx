@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Brain, GitGraph, Target, ChevronRight, Cpu, Network } from "lucide-react";
+import { Brain, GitGraph, Target, ChevronRight, Cpu, Network, Code } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -23,6 +23,7 @@ interface AlgorithmCardProps {
   description: string;
   icon: React.ReactNode;
   id: string;
+  category?: string;
 }
 
 const algorithms: AlgorithmCategory[] = [
@@ -56,6 +57,13 @@ const algorithms: AlgorithmCategory[] = [
     ]
   },
   {
+    category: "Theory of Computation",
+    icon: <Code className="w-6 h-6" />,
+    items: [
+      { name: "Regex to Finite Automata", id: "regex-to-fa", description: "Visualize the conversion of regular expressions to finite automata" }
+    ]
+  },
+  {
     category: "Sorting Algorithms",
     icon: <GitGraph className="w-6 h-6" />,
     items: [
@@ -71,20 +79,28 @@ const BackgroundPattern = () => (
   </div>
 );
 
-const AlgorithmCard = ({ title, description, icon, id }: AlgorithmCardProps) => (
-  <Link href={`/algorithms/${id}`}>
-    <div className="relative group cursor-pointer">
-      <div className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
-        <div className="flex items-center gap-4 mb-4">
-          {icon}
-          <h3 className="text-xl font-semibold text-white">{title}</h3>
+const AlgorithmCard = ({ title, description, icon, id, category }: AlgorithmCardProps) => {
+  // Create the correct link path based on the category
+  let linkPath = `/algorithms/${id}`;
+  if (category === "Theory of Computation") {
+    linkPath = `/theory-of-computation/${id}`;
+  }
+  
+  return (
+    <Link href={linkPath}>
+      <div className="relative group cursor-pointer">
+        <div className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
+          <div className="flex items-center gap-4 mb-4">
+            {icon}
+            <h3 className="text-xl font-semibold text-white">{title}</h3>
+          </div>
+          <p className="text-gray-400">{description}</p>
+          <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
-        <p className="text-gray-400">{description}</p>
-        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
-    </div>
-  </Link>
-);
+    </Link>
+  );
+};
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
@@ -114,6 +130,7 @@ export default function Home() {
             <a href="#machine-learning" className="text-gray-300 hover:text-white transition-colors">Machine Learning</a>
             <a href="#artificial-intelligence" className="text-gray-300 hover:text-white transition-colors">Artificial Intelligence</a>
             <a href="#graph-shortest-path" className="text-gray-300 hover:text-white transition-colors">Graph Shortest Path</a>
+            <a href="#theory-of-computation" className="text-gray-300 hover:text-white transition-colors">Theory of Computation</a>
             <a href="#sorting-algorithms" className="text-gray-300 hover:text-white transition-colors">Sorting Algorithms</a>
           </nav>
         </div>
@@ -144,6 +161,7 @@ export default function Home() {
                     description={item.description}
                     icon={<Target className="w-6 h-6 text-purple-500" />}
                     id={item.id}
+                    category={category.category}
                   />
                 ))}
               </div>
