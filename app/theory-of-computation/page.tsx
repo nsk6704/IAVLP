@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Code, ChevronRight } from "lucide-react";
+import { ArrowLeft, Code, ChevronRight, GitGraph, Network } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -9,13 +9,15 @@ interface VisualizationItem {
   name: string;
   id: string;
   description: string;
+  icon: React.ReactNode;
 }
 
 const visualizations: VisualizationItem[] = [
   {
     name: "Regular Expression to Finite Automata",
     id: "regex-to-fa",
-    description: "Visualize how regular expressions are converted to finite automata using Thompson's construction algorithm"
+    description: "Visualize how regular expressions are converted to finite automata using Thompson's construction algorithm",
+    icon: <Network className="w-10 h-10 text-blue-500" />
   }
 ];
 
@@ -26,16 +28,22 @@ const BackgroundPattern = () => (
   </div>
 );
 
-const VisualizationCard = ({ name, description, id }: VisualizationItem) => (
+const VisualizationCard = ({ name, description, id, icon }: VisualizationItem) => (
   <Link href={`/theory-of-computation/${id}`}>
     <div className="relative group cursor-pointer">
-      <div className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
-        <div className="flex items-center gap-4 mb-4">
-          <Code className="w-6 h-6 text-purple-500" />
-          <h3 className="text-xl font-semibold text-white">{name}</h3>
+      <div className="glass-card p-6 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-[1.02] hover:shadow-lg">
+        <div className="absolute top-4 right-4 opacity-70 group-hover:opacity-100 transition-opacity">
+          <ChevronRight className="w-5 h-5" />
         </div>
-        <p className="text-gray-400">{description}</p>
-        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="flex flex-col h-full">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-lg bg-gray-900/70 backdrop-blur-sm">
+              {icon}
+            </div>
+            <h3 className="text-xl font-semibold text-white">{name}</h3>
+          </div>
+          <p className="text-gray-300 mt-2">{description}</p>
+        </div>
       </div>
     </div>
   </Link>
@@ -53,16 +61,15 @@ export default function TheoryOfComputation() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen text-white">
       <BackgroundPattern />
-      
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-black/50 backdrop-blur-lg shadow-lg" : ""
+        scrolled ? "bg-gray-950/80 backdrop-blur-lg shadow-lg" : ""
       )}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link href="/home" className="flex items-center gap-2">
+            <Link href="/home" className="flex items-center gap-2 hover:text-blue-400 transition-colors">
               <ArrowLeft className="h-5 w-5" />
               <span className="font-semibold">Back to Home</span>
             </Link>
@@ -77,50 +84,54 @@ export default function TheoryOfComputation() {
       <main className="pt-32 pb-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-500 to-cyan-500 text-transparent bg-clip-text py-2">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 text-transparent bg-clip-text py-2">
               Theory of Computation
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Explore fundamental concepts in theoretical computer science through interactive visualizations.
             </p>
           </div>
 
           <section className="mb-20">
             <div className="flex items-center gap-3 mb-8">
-              <Code className="w-6 h-6" />
+              <div className="p-2 rounded-lg bg-blue-500/20">
+                <GitGraph className="w-6 h-6 text-blue-400" />
+              </div>
               <h2 className="text-3xl font-bold">Visualizations</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {visualizations.map((item, index) => (
                 <VisualizationCard
                   key={index}
                   name={item.name}
                   id={item.id}
                   description={item.description}
+                  icon={item.icon}
                 />
               ))}
             </div>
           </section>
 
           <section className="mb-20">
-            <div className="glass-card p-6 rounded-xl">
-              <h2 className="text-2xl font-bold mb-4">What is Theory of Computation?</h2>
-              <p className="text-gray-300 mb-4">
-                Theory of Computation is a branch of computer science that deals with how efficiently problems can be solved on a model of computation, using an algorithm. It focuses on the mathematical aspects of computing, including automata theory, formal languages, and computational complexity.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="p-4 bg-white/5 rounded-lg">
-                  <h3 className="text-xl font-semibold mb-2">Automata Theory</h3>
-                  <p className="text-gray-400">
-                    The study of abstract machines and the computational problems that can be solved using these machines. Key concepts include finite automata, pushdown automata, and Turing machines.
-                  </p>
+            <div className="glass-card p-8 rounded-xl">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-purple-500/20">
+                  <Code className="w-6 h-6 text-purple-400" />
                 </div>
-                <div className="p-4 bg-white/5 rounded-lg">
-                  <h3 className="text-xl font-semibold mb-2">Formal Languages</h3>
-                  <p className="text-gray-400">
-                    The study of mathematically defined languages, including regular expressions, context-free grammars, and the Chomsky hierarchy of language classes.
-                  </p>
-                </div>
+                <h2 className="text-2xl font-bold">About Theory of Computation</h2>
+              </div>
+              <div className="text-gray-300 space-y-4">
+                <p>
+                  Theory of Computation is a branch of computer science that deals with how problems can be solved using algorithms. 
+                  It focuses on answering the fundamental question: "What can be computed?"
+                </p>
+                <p>
+                  The field explores various computational models like finite automata, pushdown automata, and Turing machines, 
+                  as well as formal languages and their hierarchies.
+                </p>
+                <p>
+                  Our interactive visualizations help you understand these abstract concepts through hands-on exploration and step-by-step animations.
+                </p>
               </div>
             </div>
           </section>

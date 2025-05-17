@@ -38,6 +38,13 @@ const RegexToFAVisualization: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
+  // Step-by-step visualization variables
+  const [isStepMode, setIsStepMode] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [totalSteps, setTotalSteps] = useState(0);
+  const [constructionSteps, setConstructionSteps] = useState<Array<{states: State[], transitions: Transition[], description: string}>>([]);
+  const [isVisualizationComplete, setIsVisualizationComplete] = useState(false);
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -68,26 +75,45 @@ const RegexToFAVisualization: React.FC = () => {
   }, []);
 
   // Handle mouse wheel for zooming
-  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+  const handleWheel = (e: WheelEvent) => {
     e.preventDefault();
     
     const delta = -e.deltaY / 500; // Adjust zoom sensitivity
     const newZoom = Math.max(0.1, Math.min(5, zoom + delta)); // Limit zoom range
     
     // Calculate zoom center (mouse position)
-    const rect = e.currentTarget.getBoundingClientRect();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     
-    // Adjust pan to zoom toward/away from mouse position
-    const newPan = {
-      x: pan.x - (mouseX / zoom - mouseX / newZoom) * newZoom,
-      y: pan.y - (mouseY / zoom - mouseY / newZoom) * newZoom
-    };
+    // Convert mouse position to canvas coordinates
+    const canvasX = (mouseX / zoom) - pan.x;
+    const canvasY = (mouseY / zoom) - pan.y;
+    
+    // Calculate new pan to keep the point under mouse cursor fixed
+    const newPanX = (mouseX / newZoom) - canvasX;
+    const newPanY = (mouseY / newZoom) - canvasY;
     
     setZoom(newZoom);
-    setPan(newPan);
+    setPan({ x: newPanX, y: newPanY });
   };
+  
+  // Set up wheel event listener with { passive: false }
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    // Add wheel event listener with { passive: false } to allow preventDefault
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+    
+    // Clean up event listener on unmount
+    return () => {
+      canvas.removeEventListener('wheel', handleWheel);
+    };
+  }, [zoom, pan]); // Re-add listener when zoom or pan changes
   
   // Handle mouse down for panning
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -364,44 +390,85 @@ const RegexToFAVisualization: React.FC = () => {
       }
     });
   };
-
-  // Convert the regular expression to a finite automaton
+  
+  // Convert regex to finite automaton
   const convertRegexToFA = () => {
-    try {
-      setError(null);
-      
-      if (!regex.trim()) {
-        setError("Please enter a regular expression");
-        return;
-      }
-      
-      // Parse the regex and create the automaton
-      const { states, transitions } = parseRegex(regex);
-      
-      // Position the states in a circle
-      const positionedStates = positionStates(states);
-      
+    // Validate the regex
+    const validationResult = validateRegex(regex);
+    if (!validationResult.isValid) {
+      setError(validationResult.error);
+      return;
+    }
+    
+    setError(null);
+    
+    // Generate the finite automaton using Thompson's construction with steps
+    const { states: newStates, transitions: newTransitions, steps } = thompsonsConstruction(regex);
+    
+    // Store the construction steps
+    setConstructionSteps(steps.map(step => ({
+      states: positionStates(step.states),
+      transitions: step.transitions,
+      description: step.description
+    })));
+    
+    // Set the total number of steps
+    setTotalSteps(steps.length);
+    
+    // Reset to the first step
+    setCurrentStep(0);
+    
+    // If there are steps, show the first one
+    if (steps.length > 0) {
+      const firstStep = steps[0];
+      const positionedStates = positionStates(firstStep.states);
       setStates(positionedStates);
-      setTransitions(transitions);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setTransitions(firstStep.transitions);
+      setIsVisualizationComplete(false);
+    } else {
+      // If no steps (error case), clear the visualization
+      setStates([]);
+      setTransitions([]);
     }
   };
-
-  // Parse the regular expression and create the automaton
+  
+  // Move to the next step in the visualization
+  const goToNextStep = () => {
+    if (currentStep < totalSteps - 1) {
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      
+      // Update the visualization with the next step
+      if (nextStep < constructionSteps.length) {
+        const step = constructionSteps[nextStep];
+        setStates(step.states);
+        setTransitions(step.transitions);
+      }
+      
+      // Check if we've reached the final step
+      if (nextStep === totalSteps - 1) {
+        setIsVisualizationComplete(true);
+      }
+    }
+  };
+  
+  
   const parseRegex = (regex: string): { states: State[], transitions: Transition[] } => {
     // Basic validation of regex
-    validateRegex(regex);
+    const validationResult = validateRegex(regex);
+    if (!validationResult.isValid) {
+      throw new Error(validationResult.error || "Invalid regex");
+    }
     
     // Thompson's construction algorithm (simplified version)
     return thompsonsConstruction(regex);
   };
 
   // Validate the regular expression
-  const validateRegex = (regex: string) => {
+  const validateRegex = (regex: string): { isValid: boolean, error: string | null } => {
     // Check for empty regex
     if (regex.trim() === '') {
-      return; // Empty regex is valid
+      return { isValid: false, error: "Please enter a regular expression" };
     }
     
     // Check for valid characters and operators
@@ -413,13 +480,21 @@ const RegexToFAVisualization: React.FC = () => {
     for (let i = 0; i < regex.length; i++) {
       if (regex[i] === '(') parenthesesCount++;
       if (regex[i] === ')') parenthesesCount--;
-      if (parenthesesCount < 0) throw new Error("Unbalanced parentheses in regex");
+      if (parenthesesCount < 0) {
+        return { isValid: false, error: "Unbalanced parentheses in regex" };
+      }
     }
-    if (parenthesesCount !== 0) throw new Error("Unbalanced parentheses in regex");
+    
+    if (parenthesesCount !== 0) {
+      return { isValid: false, error: "Unbalanced parentheses in regex" };
+    }
     
     for (let i = 0; i < regex.length; i++) {
       if (!validChars.test(regex[i])) {
-        throw new Error(`Invalid character in regex: ${regex[i]}. Only lowercase alphabets (a-z), operators (., +, *), and parentheses are allowed.`);
+        return { 
+          isValid: false, 
+          error: `Invalid character in regex: ${regex[i]}. Only lowercase alphabets (a-z), operators (., +, *), and parentheses are allowed.`
+        };
       }
       
       // Check for consecutive operators
@@ -429,30 +504,36 @@ const RegexToFAVisualization: React.FC = () => {
       
       // Operator cannot be at the beginning (except opening parenthesis)
       if (i === 0 && validOperators.includes(regex[i])) {
-        throw new Error(`Operator ${regex[i]} cannot be at the beginning of regex`);
+        return { isValid: false, error: `Operator ${regex[i]} cannot be at the beginning of regex` };
       }
       
       // Check for operators at the end (except * and closing parenthesis)
       if (i === regex.length - 1 && (regex[i] === '.' || regex[i] === '+')) {
-        throw new Error(`Operator ${regex[i]} cannot be at the end of regex`);
+        return { isValid: false, error: `Operator ${regex[i]} cannot be at the end of regex` };
       }
       
       // Check for proper operands for operators
       if ((regex[i] === '.' || regex[i] === '+') && i + 1 >= regex.length) {
-        throw new Error(`Missing operand after ${regex[i]} operator`);
+        return { isValid: false, error: `Missing operand after ${regex[i]} operator` };
       }
       
       // Check for proper operand before * operator
       if (regex[i] === '*' && (i === 0 || (validOperators.includes(regex[i-1]) && regex[i-1] !== ')'))) {
-        throw new Error(`Missing operand before * operator`);
+        return { isValid: false, error: `Missing operand before * operator` };
       }
     }
+    
+    // If we get here, the regex is valid
+    return { isValid: true, error: null };
   };
 
   // Simplified Thompson's construction algorithm with parentheses support
-  // Concatenation: '.', Union: '+', Kleene star: '*'
-  const thompsonsConstruction = (regex: string): { states: State[], transitions: Transition[] } => {
+  // Convert regex to finite automata using Thompson's construction algorithm with step-by-step tracking
+  const thompsonsConstruction = (regex: string): { states: State[], transitions: Transition[], steps: Array<{states: State[], transitions: Transition[], description: string}> } => {
     let stateCounter = 0;
+    const steps: Array<{states: State[], transitions: Transition[], description: string}> = [];
+    
+    // Create a new state
     const createState = (isInitial = false, isFinal = false): State => {
       return {
         id: `q${stateCounter++}`,
@@ -463,21 +544,39 @@ const RegexToFAVisualization: React.FC = () => {
       };
     };
     
+    // Helper function to add a step to the construction process
+    const addStep = (states: State[], transitions: Transition[], description: string) => {
+      // Deep clone the states and transitions to avoid reference issues
+      const statesClone = states.map(s => ({ ...s }));
+      const transitionsClone = transitions.map(t => ({ ...t }));
+      
+      steps.push({
+        states: statesClone,
+        transitions: transitionsClone,
+        description
+      });
+    };
+    
     // Create initial and final states
     const initialState = createState(true, false);
     const finalState = createState(false, true);
     
-    const states: State[] = [initialState, finalState];
-    const transitions: Transition[] = [];
+    const allStates: State[] = [initialState, finalState];
+    const allTransitions: Transition[] = [];
+    
+    // Add initial step
+    addStep([...allStates], [...allTransitions], `Starting construction for regex: ${regex}`);
     
     // If the regex is empty, add an epsilon transition from initial to final
     if (regex.length === 0) {
-      transitions.push({
+      allTransitions.push({
         from: initialState.id,
         to: finalState.id,
         symbol: "ε"
       });
-      return { states, transitions };
+      
+      addStep([...allStates], [...allTransitions], `Added epsilon transition for empty regex`);
+      return { states: allStates, transitions: allTransitions, steps };
     }
 
     // Parse the regex using a recursive descent parser
@@ -487,14 +586,15 @@ const RegexToFAVisualization: React.FC = () => {
       if (startIdx > endIdx) {
         const start = createState();
         const end = createState();
-        states.push(start, end);
+        allStates.push(start, end);
         
-        transitions.push({
+        allTransitions.push({
           from: start.id,
           to: end.id,
           symbol: "ε"
         });
         
+        addStep([...allStates], [...allTransitions], `Created empty expression NFA`);
         return { start, end };
       }
       
@@ -521,32 +621,33 @@ const RegexToFAVisualization: React.FC = () => {
         // Create a new start and end state for the union
         const start = createState();
         const end = createState();
-        states.push(start, end);
+        allStates.push(start, end);
         
         // Connect start to both branches
-        transitions.push({
+        allTransitions.push({
           from: start.id,
           to: leftNFA.start.id,
           symbol: "ε"
         });
-        transitions.push({
+        allTransitions.push({
           from: start.id,
           to: rightNFA.start.id,
           symbol: "ε"
         });
         
         // Connect both branches to end
-        transitions.push({
+        allTransitions.push({
           from: leftNFA.end.id,
           to: end.id,
           symbol: "ε"
         });
-        transitions.push({
+        allTransitions.push({
           from: rightNFA.end.id,
           to: end.id,
           symbol: "ε"
         });
         
+        addStep([...allStates], [...allTransitions], `Applied union operation (+)`);
         return { start, end };
       }
       
@@ -572,12 +673,13 @@ const RegexToFAVisualization: React.FC = () => {
         const rightNFA = parseRegex(expr, lowestPrecedenceIdx + 1, endIdx);
         
         // Connect the end of the left NFA to the start of the right NFA
-        transitions.push({
+        allTransitions.push({
           from: leftNFA.end.id,
           to: rightNFA.start.id,
           symbol: "ε"
         });
         
+        addStep([...allStates], [...allTransitions], `Applied concatenation operation (.)`);
         return { start: leftNFA.start, end: rightNFA.end };
       }
       
@@ -589,53 +691,57 @@ const RegexToFAVisualization: React.FC = () => {
         // Create a new start and end state for the star
         const start = createState();
         const end = createState();
-        states.push(start, end);
+        allStates.push(start, end);
         
         // Connect start to subexpression start and directly to end (skip)
-        transitions.push({
+        allTransitions.push({
           from: start.id,
           to: subNFA.start.id,
           symbol: "ε"
         });
-        transitions.push({
+        allTransitions.push({
           from: start.id,
           to: end.id,
           symbol: "ε"
         });
         
         // Connect subexpression end back to start (loop) and to end
-        transitions.push({
+        allTransitions.push({
           from: subNFA.end.id,
           to: subNFA.start.id,
           symbol: "ε"
         });
-        transitions.push({
+        allTransitions.push({
           from: subNFA.end.id,
           to: end.id,
           symbol: "ε"
         });
         
+        addStep([...allStates], [...allTransitions], `Applied Kleene star operation (*)`);
         return { start, end };
       }
       
       // Check for parenthesized expression
       if (expr[startIdx] === '(' && expr[endIdx] === ')') {
         // Remove the outer parentheses and parse the inner expression
-        return parseRegex(expr, startIdx + 1, endIdx - 1);
+        const result = parseRegex(expr, startIdx + 1, endIdx - 1);
+        addStep([...allStates], [...allTransitions], `Processed subexpression (${expr.substring(startIdx + 1, endIdx)})`);
+        return result;
       }
       
       // Base case: single character
       if (startIdx === endIdx) {
         const start = createState();
         const end = createState();
-        states.push(start, end);
+        allStates.push(start, end);
         
-        transitions.push({
+        allTransitions.push({
           from: start.id,
           to: end.id,
           symbol: expr[startIdx]
         });
         
+        addStep([...allStates], [...allTransitions], `Created NFA for character '${expr[startIdx]}'`);
         return { start, end };
       }
       
@@ -643,39 +749,47 @@ const RegexToFAVisualization: React.FC = () => {
       throw new Error("Invalid regular expression");
     };
     
-    // Parse the regex and get the resulting NFA
-    const nfa = parseRegex(regex, 0, regex.length - 1);
-    
-    // Connect the initial state to the NFA start state
-    transitions.push({
-      from: initialState.id,
-      to: nfa.start.id,
-      symbol: "ε"
-    });
-    
-    // Connect the NFA end state to the final state
-    transitions.push({
-      from: nfa.end.id,
-      to: finalState.id,
-      symbol: "ε"
-    });
-    
-    return { states, transitions };
+    try {
+      // Parse the regex and get the resulting NFA
+      const nfa = parseRegex(regex, 0, regex.length - 1);
+      
+      // Connect the initial state to the NFA start state
+      allTransitions.push({
+        from: initialState.id,
+        to: nfa.start.id,
+        symbol: "ε"
+      });
+      
+      // Connect the NFA end state to the final state
+      allTransitions.push({
+        from: nfa.end.id,
+        to: finalState.id,
+        symbol: "ε"
+      });
+      
+      // Add final step
+      addStep([...allStates], [...allTransitions], `Completed NFA construction`);
+      
+      return { states: allStates, transitions: allTransitions, steps };
+    } catch (error) {
+      console.error("Error parsing regex:", error);
+      return { states: [], transitions: [], steps };
+    }
   };
 
-  // Position the states in a simple grid layout with maximum spacing
+  // Position the states in a simple hierarchical layout
   const positionStates = (states: State[]): State[] => {
     // Create a copy of states to modify
     const positionedStates = states.map(state => ({ ...state }));
     
-    // Set fixed positions based on state type and a simple grid
+    // Set fixed positions based on state type
     const initialState = positionedStates.find(s => s.isInitial);
     const finalStates = positionedStates.filter(s => s.isFinal);
     const regularStates = positionedStates.filter(s => !s.isInitial && !s.isFinal);
     
     // Constants for spacing
-    const horizontalSpacing = 600; // Extremely large horizontal spacing
-    const verticalSpacing = 300;   // Extremely large vertical spacing
+    const horizontalSpacing = 300; // Horizontal spacing between states
+    const verticalSpacing = 200;   // Vertical spacing between states
     const leftMargin = 200;        // Left margin
     
     // Step 1: Position initial state on the left
@@ -704,31 +818,32 @@ const RegexToFAVisualization: React.FC = () => {
       }
     }
     
-    // Step 3: Position regular states in a grid between initial and final
+    // Step 3: Position regular states in a layered approach from left to right
     if (regularStates.length > 0) {
-      // Determine grid dimensions based on number of states
-      const gridColumns = Math.min(5, Math.ceil(Math.sqrt(regularStates.length)));
-      const gridRows = Math.ceil(regularStates.length / gridColumns);
+      // Determine number of layers based on state count
+      const numLayers = Math.min(5, Math.ceil(Math.sqrt(regularStates.length)));
+      const statesPerLayer = Math.ceil(regularStates.length / numLayers);
       
       // Calculate available space
       const availableWidth = canvasSize.width - (2 * leftMargin);
-      const availableHeight = canvasSize.height - 100; // 50px margin top and bottom
+      const layerWidth = availableWidth / (numLayers + 1); // +1 for spacing
       
-      // Calculate grid cell size
-      const cellWidth = availableWidth / (gridColumns + 1); // +1 to leave space for initial/final
-      const cellHeight = availableHeight / Math.max(2, gridRows);
-      
-      // Position each regular state in a grid cell
+      // Position each regular state in its layer
       regularStates.forEach((state, index) => {
-        const column = index % gridColumns;
-        const row = Math.floor(index / gridColumns);
+        const layer = Math.floor(index / statesPerLayer);
+        const posInLayer = index % statesPerLayer;
         
-        // Calculate position with offset to avoid exact grid alignment
-        const xOffset = (Math.random() * 0.4 - 0.2) * cellWidth; // ±20% random offset
-        const yOffset = (Math.random() * 0.4 - 0.2) * cellHeight; // ±20% random offset
+        // Calculate vertical position within layer
+        const layerHeight = canvasSize.height - 200; // 100px margin top and bottom
+        const verticalStep = layerHeight / (statesPerLayer + 1);
         
-        state.x = leftMargin + cellWidth + (column * cellWidth) + xOffset;
-        state.y = (cellHeight / 2) + (row * cellHeight) + yOffset;
+        // Add slight randomness to positions for better visualization
+        const xOffset = (Math.random() * 0.3 - 0.15) * layerWidth; // ±15% random offset
+        const yOffset = (Math.random() * 0.3 - 0.15) * verticalStep; // ±15% random offset
+        
+        // Position the state
+        state.x = leftMargin + (layer + 1) * layerWidth + xOffset;
+        state.y = 100 + (posInLayer + 1) * verticalStep + yOffset;
       });
     }
     
@@ -779,12 +894,9 @@ const RegexToFAVisualization: React.FC = () => {
     return positionedStates;
   };
 
-  // Reset the visualization
+  // Reset the visualization by reloading the page
   const resetVisualization = () => {
-    setRegex("");
-    setStates([]);
-    setTransitions([]);
-    setError(null);
+    window.location.reload();
   };
 
   return (
@@ -822,8 +934,8 @@ const RegexToFAVisualization: React.FC = () => {
                       <span>Regular Expression</span>
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-4 w-4 text-gray-400" />
+                          <TooltipTrigger asChild suppressHydrationWarning>
+                            <span><Info className="h-4 w-4 text-gray-400" /></span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="max-w-xs">
@@ -855,6 +967,7 @@ const RegexToFAVisualization: React.FC = () => {
                       onClick={convertRegexToFA}
                       variant="outline"
                       className="flex-1"
+                      suppressHydrationWarning
                     >
                       <Play className="mr-2 h-4 w-4" />
                       Convert
@@ -864,6 +977,7 @@ const RegexToFAVisualization: React.FC = () => {
                       onClick={resetVisualization}
                       variant="outline"
                       className="flex-1"
+                      suppressHydrationWarning
                     >
                       <RefreshCw className="mr-2 h-4 w-4" />
                       Reset
@@ -872,24 +986,49 @@ const RegexToFAVisualization: React.FC = () => {
                 </div>
                 
                 {/* Visualization canvas with zoom and pan */}
-                <div ref={containerRef} className="w-full h-[500px] bg-gray-900 rounded-lg overflow-hidden mt-4 relative">
-                  <canvas
-                    ref={canvasRef}
-                    width={canvasSize.width}
-                    height={canvasSize.height}
-                    className="w-full h-full cursor-move"
-                    onWheel={handleWheel}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseLeave}
-                  />
-                  
-                  {states.length === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none">
-                      Enter a regular expression and click Convert to visualize the finite automaton
+                <div className="mt-4">
+                  {/* Step indicator and Next button */}
+                  {totalSteps > 0 && (
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="text-sm text-gray-400">
+                        Step {currentStep + 1} of {totalSteps}
+                        {constructionSteps[currentStep] && (
+                          <span className="ml-2 text-gray-300">
+                            {constructionSteps[currentStep].description}
+                          </span>
+                        )}
+                      </div>
+                      <Button
+                        onClick={goToNextStep}
+                        variant="outline"
+                        disabled={currentStep >= totalSteps - 1 || isVisualizationComplete}
+                        className="ml-2"
+                        suppressHydrationWarning
+                      >
+                        Next Step
+                      </Button>
                     </div>
                   )}
+                  
+                  {/* Canvas container */}
+                  <div ref={containerRef} className="w-full h-[500px] bg-gray-900 rounded-lg overflow-hidden relative">
+                    <canvas
+                      ref={canvasRef}
+                      width={canvasSize.width}
+                      height={canvasSize.height}
+                      className="w-full h-full cursor-move"
+                      onMouseDown={handleMouseDown}
+                      onMouseMove={handleMouseMove}
+                      onMouseUp={handleMouseUp}
+                      onMouseLeave={handleMouseLeave}
+                    />
+                    
+                    {states.length === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none">
+                        Enter a regular expression and click Convert to visualize the finite automaton
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Legend */}
