@@ -131,6 +131,10 @@ export default function Home() {
             <a href="#graph-shortest-path" className="text-gray-300 hover:text-white transition-colors">Graph Shortest Path</a>
             <a href="#theory-of-computation" className="text-gray-300 hover:text-white transition-colors">Theory of Computation</a>
             <a href="#sorting-algorithms" className="text-gray-300 hover:text-white transition-colors">Sorting Algorithms</a>
+            <Link href="/graph" className="text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
+              
+              Knowledge Graph
+            </Link>
           </nav>
         </div>
       </header>
@@ -144,6 +148,14 @@ export default function Home() {
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
               Interactive visualizations of popular Machine Learning and Artificial Intelligence algorithms. Learn through exploration and experimentation.
             </p>
+
+            <Link href="/graph">
+              <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-medium text-white hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
+                
+                Explore CS Knowledge Graph
+                
+              </div>
+            </Link>
           </div>
 
           {algorithms.map((category, idx) => (
