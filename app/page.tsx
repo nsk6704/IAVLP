@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GitGraph, Target, ChevronRight } from "lucide-react";
+import { GitGraph, Target, ChevronRight, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -31,6 +31,13 @@ const algorithms: AlgorithmCategory[] = [
     icon: <GitGraph className="w-6 h-6" />,
     items: [
       { name: "Sorting Visualizer", id: "sorting", description: "Interactive visualization of popular sorting algorithms with customizable parameters" }
+    ]
+  },
+  {
+    category: "Searching Algorithms",
+    icon: <Search className="w-6 h-6" />,
+    items: [
+      { name: "Search Visualizer", id: "searching", description: "Interactive visualization of efficient search algorithms with step-by-step animations" }
     ]
   }
 ];
@@ -90,7 +97,7 @@ export default function Home() {
       <main className="pt-32 pb-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-500 to-cyan-500 text-transparent bg-clip-text py-2">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-500 to-cyan-500 text-transparent bg-clip-text py-2 antialiased">
               AlgoViz
             </h1>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
