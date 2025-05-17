@@ -187,13 +187,6 @@ export default function SortingVisualizer() {
           </div>
 
           <div className="flex flex-wrap gap-4 mb-8 justify-center">
-            <Link href="/algorithms/sorting/quiz">
-              <Button
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-              >
-                Take Quiz
-              </Button>
-            </Link>
             <Button
               onClick={startSorting}
               disabled={isSorting || isSorted}

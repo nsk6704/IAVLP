@@ -364,13 +364,6 @@ const KNNVisualization: React.FC = () => {
             {/* Controls - Top section */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div className="flex flex-wrap gap-2 sm:gap-4">
-                <Link href="/algorithms/knn/quiz">
-                  <Button
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                  >
-                    Take Quiz
-                  </Button>
-                </Link>
                 <Button
                   onClick={generateRandomPoints}
                   variant="outline"

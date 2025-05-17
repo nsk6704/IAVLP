@@ -1,13 +1,20 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { quizQuestions, QuizQuestion } from '../quiz-data';
-import { GitGraph, ArrowLeft } from 'lucide-react';
+import { fetchAIQuizQuestions, QuizQuestion } from '@/lib/ai-quiz-service';
+import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
-export default function QuizPage() {
+interface AIQuizProps {
+  topic: string;
+  returnUrl: string;
+  pageTitle: string;
+}
+
+export default function AIQuiz({ topic, returnUrl, pageTitle }: AIQuizProps) {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -15,12 +22,36 @@ export default function QuizPage() {
   const [showResult, setShowResult] = useState(false);
   const [answers, setAnswers] = useState<number[]>([]);
   const [scrolled, setScrolled] = useState(false);
+  const [currentScore, setCurrentScore] = useState(0.5); // Start with medium difficulty
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Initialize quiz with 10 random questions
+  // Fetch questions from AI bot
+  const fetchQuestions = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetchAIQuizQuestions(topic, currentScore);
+      
+      if (response.success && response.questions.length > 0) {
+        setQuestions(response.questions);
+        setAnswers(new Array(response.questions.length).fill(-1));
+        setIsLoading(false);
+      } else {
+        setError(response.message || "Failed to load questions. Please try again.");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setError("An unexpected error occurred. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  // Initialize quiz
   useEffect(() => {
-    const shuffled = [...quizQuestions].sort(() => 0.5 - Math.random());
-    setQuestions(shuffled.slice(0, 10));
-    setAnswers(new Array(10).fill(-1));
+    fetchQuestions();
     
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -28,7 +59,7 @@ export default function QuizPage() {
     
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [topic]);
 
   const handleOptionSelect = (optionIndex: number) => {
     setSelectedOption(optionIndex);
@@ -57,20 +88,79 @@ export default function QuizPage() {
   };
 
   const resetQuiz = () => {
-    const shuffled = [...quizQuestions].sort(() => 0.5 - Math.random());
-    setQuestions(shuffled.slice(0, 10));
+    // Calculate new difficulty level based on performance
+    const newCurrentScore = score / questions.length;
+    setCurrentScore(newCurrentScore);
+    
+    // Reset quiz state
     setCurrentQuestionIndex(0);
     setSelectedOption(null);
     setScore(0);
     setShowResult(false);
-    setAnswers(new Array(10).fill(-1));
+    setAnswers([]);
+    setIsLoading(true);
+    
+    // Show toast with feedback
+    toast({
+      title: "Quiz difficulty adjusted",
+      description: `Based on your score of ${score}/${questions.length}, the next quiz will be ${
+        newCurrentScore < 0.4 ? "easier" : newCurrentScore > 0.7 ? "more challenging" : "similar difficulty"
+      }.`,
+      duration: 3000,
+    });
+    
+    // Fetch new questions with updated difficulty
+    fetchQuestions();
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-t-4 border-purple-500 border-solid rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl">Loading AI-powered quiz...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center max-w-md backdrop-blur-lg bg-white/5 border border-white/10 rounded-xl p-8">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold mb-4">Error Loading Quiz</h2>
+          <p className="text-gray-400 mb-6">{error}</p>
+          <div className="flex gap-4 justify-center">
+            <Button 
+              onClick={fetchQuestions}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+            >
+              Try Again
+            </Button>
+            <Link href={returnUrl}>
+              <Button 
+                className="bg-white/10 hover:bg-white/20"
+              >
+                Back to {pageTitle}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (questions.length === 0) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl">Loading quiz...</p>
+          <p className="text-xl">No questions available. Please try again later.</p>
+          <Link href={returnUrl} className="mt-4 inline-block">
+            <Button>
+              Back to {pageTitle}
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -84,15 +174,13 @@ export default function QuizPage() {
         <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl -bottom-250 -left-250 animate-pulse delay-1000" />
       </div>
       
-      {/* Using universal header - custom header removed */}
-
       <main className="pt-32 pb-20 px-4">
         <div className="max-w-3xl mx-auto">
           {!showResult ? (
             <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-xl p-8">
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h1 className="text-2xl font-bold">Sorting Algorithms Quiz</h1>
+                  <h1 className="text-2xl font-bold">{pageTitle} Quiz</h1>
                   <span className="text-sm bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
                     Question {currentQuestionIndex + 1} of {questions.length}
                   </span>
@@ -164,7 +252,7 @@ export default function QuizPage() {
                   </div>
                 ) : score >= questions.length * 0.7 ? (
                   <div className="p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 mb-8">
-                    <p className="font-medium">Great job! You have a solid understanding of sorting algorithms.</p>
+                    <p className="font-medium">Great job! You have a solid understanding of {topic} algorithms.</p>
                   </div>
                 ) : score >= questions.length * 0.5 ? (
                   <div className="p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-300 mb-8">
@@ -172,7 +260,7 @@ export default function QuizPage() {
                   </div>
                 ) : (
                   <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 mb-8">
-                    <p className="font-medium">Keep practicing! Sorting algorithms can be tricky.</p>
+                    <p className="font-medium">Keep practicing! {pageTitle} concepts can be tricky.</p>
                   </div>
                 )}
               </div>
@@ -211,11 +299,11 @@ export default function QuizPage() {
                 >
                   Try Again
                 </Button>
-                <Link href="/algorithms/sorting" className="flex-1">
+                <Link href={returnUrl} className="flex-1">
                   <Button 
                     className="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-lg font-medium"
                   >
-                    Back to Sorting Visualizer
+                    Back to {pageTitle}
                   </Button>
                 </Link>
               </div>

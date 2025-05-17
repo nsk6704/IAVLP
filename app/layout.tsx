@@ -10,6 +10,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Header } from "@/components/header";
 import { ContentWrapper } from "@/components/content-wrapper"; // Move to separate client file
+import { ExpandableChatWrapper } from "@/components/expandable-chat-wrapper";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -35,6 +36,7 @@ export default function RootLayout({
                 {children}
               </ContentWrapper>
             </div>
+            <ExpandableChatWrapper />
             <Analytics />
             <SpeedInsights />
           </SidebarProvider>

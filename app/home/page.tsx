@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Brain, GitGraph, Target, ChevronRight, Cpu, Network, Code } from "lucide-react";
+import { Brain, GitGraph, Target, ChevronRight, Cpu, Network, Code, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -145,6 +145,50 @@ export default function Home() {
                 </p>
               </div>
 
+              {/* AI Quiz Section */}
+              <section className="mb-20" id="ai-quiz">
+                <div className="flex items-center gap-3 mb-8">
+                  <BookOpen className="w-6 h-6" />
+                  <h2 className="text-3xl font-bold">AI-Powered Quiz</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                  <Link href="/quiz">
+                    <div className="relative group cursor-pointer">
+                      <div className="p-6 rounded-xl backdrop-blur-md bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
+                        <div className="flex items-center gap-4 mb-4">
+                          <BookOpen className="w-6 h-6 text-purple-500" />
+                          <h3 className="text-xl font-semibold text-white">Take a Custom Quiz</h3>
+                        </div>
+                        <p className="text-gray-400">Test your knowledge with our AI-generated quizzes. Choose any topic and difficulty level.</p>
+                        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </section>
+              
+              {/* Learning Path Section */}
+              <section className="mb-20" id="learning-path">
+                <div className="flex items-center gap-3 mb-8">
+                  <GitGraph className="w-6 h-6" />
+                  <h2 className="text-3xl font-bold">Learning Path</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                  <Link href="/learning-path">
+                    <div className="relative group cursor-pointer">
+                      <div className="p-6 rounded-xl backdrop-blur-md bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
+                        <div className="flex items-center gap-4 mb-4">
+                          <GitGraph className="w-6 h-6 text-blue-500" />
+                          <h3 className="text-xl font-semibold text-white">Get a Custom Learning Path</h3>
+                        </div>
+                        <p className="text-gray-400">Receive a personalized step-by-step learning path for any topic you want to master.</p>
+                        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </section>
+              
               {algorithms.map((category, idx) => (
                 <section key={idx} className="mb-20" id={category.category.toLowerCase().replace(" ", "-")}>
                   <div className="flex items-center gap-3 mb-8">

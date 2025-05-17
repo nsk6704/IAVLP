@@ -32,8 +32,6 @@ const ComplexityAnalyzer: React.FC = () => {
     { id: "quick", name: "Quick Sort", complexity: "O(n log n)" },
     { id: "merge", name: "Merge Sort", complexity: "O(n log n)" },
     { id: "heap", name: "Heap Sort", complexity: "O(n log n)" },
-    { id: "counting", name: "Counting Sort", complexity: "O(n+k)" },
-    { id: "radix", name: "Radix Sort", complexity: "O(d(n+k))" },
   ];
 
   // Track scroll position for navbar styling
