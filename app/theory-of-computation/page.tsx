@@ -63,23 +63,7 @@ export default function TheoryOfComputation() {
   return (
     <div className="min-h-screen text-white">
       <BackgroundPattern />
-      <header className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-gray-950/80 backdrop-blur-lg shadow-lg" : ""
-      )}>
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/home" className="flex items-center gap-2 hover:text-blue-400 transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="font-semibold">Back to Home</span>
-            </Link>
-          </div>
-          <div>
-            <h1 className="text-lg sm:text-xl font-bold">Theory of Computation</h1>
-          </div>
-          <div className="w-20"></div> {/* Spacer for balance */}
-        </div>
-      </header>
+      
 
       <main className="pt-32 pb-20 px-4">
         <div className="max-w-7xl mx-auto">

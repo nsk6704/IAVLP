@@ -901,24 +901,7 @@ const RegexToFAVisualization: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Navbar */}
-      <header className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-black/50 backdrop-blur-lg shadow-lg" : ""
-      )}>
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/home" className="flex items-center gap-2">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="font-semibold">Back to Home</span>
-            </Link>
-          </div>
-          <div>
-            <h1 className="text-lg sm:text-xl font-bold">Regular Expression to Finite Automata</h1>
-          </div>
-          <div className="w-20"></div> {/* Spacer for balance */}
-        </div>
-      </header>
+      {/* Using universal header - custom header removed */}
 
       {/* Main content */}
       <main className="pt-24 pb-16 px-4">

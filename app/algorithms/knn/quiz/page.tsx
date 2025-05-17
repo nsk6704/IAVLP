@@ -85,24 +85,7 @@ export default function QuizPage() {
         <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl -bottom-250 -left-250 animate-pulse delay-1000" />
       </div>
       
-      {/* Header */}
-      <header className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-black/50 backdrop-blur-xl shadow-lg" : ""
-      )}>
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <GitGraph className="w-8 h-8 text-purple-500" />
-            <span className="text-xl font-bold">AlgoViz</span>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/algorithms/knn" className="text-gray-300 hover:text-white transition-colors flex items-center gap-1">
-              <ArrowLeft className="w-4 h-4" />
-              Back to KNN Visualizer
-            </Link>
-          </nav>
-        </div>
-      </header>
+      {/* Using universal header - custom header removed */}
 
       <main className="pt-32 pb-20 px-4">
         <div className="max-w-3xl mx-auto">

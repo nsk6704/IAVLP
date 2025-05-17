@@ -5,6 +5,12 @@ import { Brain, GitGraph, Target, ChevronRight, Cpu, Network, Code } from "lucid
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+// Import layout components
+import { Header } from "@/components/header";
+import { AppSidebar } from "@/components/app-sidebar";
+import { HomeContentWrapper } from "@/components/home-content-wrapper";
+import { SidebarProvider } from "@/components/ui/sidebar";
+
 interface AlgorithmItem {
   name: string;
   id: string;
@@ -116,61 +122,53 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <BackgroundPattern />
+    <SidebarProvider defaultOpen={true}>
+      {/* Header component */}
+      <Header />
       
-      <header className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-black/50 backdrop-blur-lg shadow-lg" : ""
-      )}>
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <GitGraph className="w-8 h-8 text-purple-500" />
-            <span className="text-xl font-bold ">AlgoViz</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#machine-learning" className="text-gray-300 hover:text-white transition-colors">Machine Learning</a>
-            <a href="#artificial-intelligence" className="text-gray-300 hover:text-white transition-colors">Artificial Intelligence</a>
-            <a href="#graph-shortest-path" className="text-gray-300 hover:text-white transition-colors">Graph Shortest Path</a>
-            <a href="#theory-of-computation" className="text-gray-300 hover:text-white transition-colors">Theory of Computation</a>
-            <a href="#sorting-algorithms" className="text-gray-300 hover:text-white transition-colors">Sorting Algorithms</a>
-          </nav>
-        </div>
-      </header>
-
-      <main className="pt-32 pb-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-500 to-cyan-500 text-transparent bg-clip-text py-2">
-              AlgoViz
-            </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Interactive visualizations of popular Machine Learning and Artificial Intelligence algorithms. Learn through exploration and experimentation.
-            </p>
-          </div>
-
-          {algorithms.map((category, idx) => (
-            <section key={idx} className="mb-20" id={category.category.toLowerCase().replace(" ", "-")}>
-              <div className="flex items-center gap-3 mb-8">
-                {category.icon}
-                <h2 className="text-3xl font-bold">{category.category}</h2>
+      {/* Sidebar component */}
+      <AppSidebar />
+      
+      {/* Main content with specialized wrapper for home page */}
+      <HomeContentWrapper>
+        <div className="min-h-screen bg-black text-white">
+          <BackgroundPattern />
+          
+          <main className="pt-32 pb-20 px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-20">
+                <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-500 to-cyan-500 text-transparent bg-clip-text py-2">
+                  AlgoViz
+                </h1>
+                <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                  Interactive visualizations of popular Machine Learning and Artificial Intelligence algorithms. Learn through exploration and experimentation.
+                </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {category.items.map((item, itemIdx) => (
-                  <AlgorithmCard
-                    key={itemIdx}
-                    title={item.name}
-                    description={item.description}
-                    icon={<Target className="w-6 h-6 text-purple-500" />}
-                    id={item.id}
-                    category={category.category}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
+
+              {algorithms.map((category, idx) => (
+                <section key={idx} className="mb-20" id={category.category.toLowerCase().replace(" ", "-")}>
+                  <div className="flex items-center gap-3 mb-8">
+                    {category.icon}
+                    <h2 className="text-3xl font-bold">{category.category}</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {category.items.map((item, itemIdx) => (
+                      <AlgorithmCard
+                        key={itemIdx}
+                        title={item.name}
+                        description={item.description}
+                        icon={<Target className="w-6 h-6 text-purple-500" />}
+                        id={item.id}
+                        category={category.category}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </HomeContentWrapper>
+    </SidebarProvider>
   );
 }
