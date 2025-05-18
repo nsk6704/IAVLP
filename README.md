@@ -18,6 +18,12 @@ IAVLP (Interactive Algorithm Visualization Learning Platform) is a comprehensive
 - **Minimax with α-β Pruning**: Interactive game tree visualization with alpha-beta pruning demonstration
 - **Hill Climb Search**: Explore local search optimization techniques through visualization
 
+### Sorting Algorithms
+
+- **Quick Sort**: Animated divide‑and‑conquer sorting with pivot selection and partition steps  
+- **Merge Sort**: Visualize recursive splitting and merging of subarrays  
+- **Heap Sort**: Interactive heap construction and extraction to demonstrate in‑place sorting  
+
 ### Theory of Computation
 
 - **Regular Expression to Finite Automata**: Visualize how regular expressions are converted to finite automata using Thompson's construction algorithm
