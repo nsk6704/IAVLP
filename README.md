@@ -9,7 +9,7 @@ IAVLP (Interactive Algorithm Visualization Learning Platform) is a comprehensive
 ### Graph Algorithms
 
 - **Dijkstra's Algorithm**: Visualize shortest path finding in weighted graphs with uniform cost search
-- **A* Pathfinding**: Explore efficient pathfinding using heuristic-based search techniques
+- **A-star Pathfinding**: Explore efficient pathfinding using heuristic-based search techniques
 - **DFS Traversal**: Understand depth-first search traversal and path finding in graphs
 
 ### AI & Machine Learning
