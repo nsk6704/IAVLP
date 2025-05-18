@@ -13,7 +13,7 @@ export function HomeContentWrapper({ children }: HomeContentWrapperProps) {
   const isCollapsed = state === "collapsed";
   
   // Get sidebar visibility from header component's state
-  const [sidebarVisible, setSidebarVisible] = React.useState(true);
+  const [sidebarVisible, setSidebarVisible] = React.useState(false);
   
   // Listen for sidebar visibility changes
   React.useEffect(() => {

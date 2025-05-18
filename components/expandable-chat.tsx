@@ -66,7 +66,7 @@ export function ExpandableChat() {
       const requestBody = { question: inputValue };
       console.log('Sending request:', requestBody);
       
-      const response = await fetch("https://7100-34-125-133-151.ngrok-free.app/chat", {
+      const response = await fetch("https://ae6d-35-223-227-18.ngrok-free.app/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -195,7 +195,7 @@ function getMockLearningPath(topic: string): LearningPathStep[] {
 export async function fetchLearningPath(topic: string): Promise<LearningPathResponse | LearningPathImageResponse> {
   try {
     // Use the exact specified ngrok URL directly
-    const apiUrl = `https://7100-34-125-133-151.ngrok-free.app/learning-path`;
+    const apiUrl = `https://ae6d-35-223-227-18.ngrok-free.app/learning-path`;
     
     // Use the URL with the topic as a query parameter
     console.log(`Using direct ngrok URL with topic: ${topic}`);

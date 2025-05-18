@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Use the exact URL specified
-    const url = `https://7100-34-125-133-151.ngrok-free.app/learning-path`;
+    const url = `https://ae6d-35-223-227-18.ngrok-free.app/learning-path`;
     
     console.log(`Making direct POST request to: ${url} with topic: ${topic}`);
     
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Use the exact URL specified
-    const url = 'https://7100-34-125-133-151.ngrok-free.app/learning-path';
+    const url = 'https://ae6d-35-223-227-18.ngrok-free.app/learning-path';
     
     console.log(`Making direct POST request to: ${url}`);
     

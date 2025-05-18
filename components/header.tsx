@@ -51,7 +51,7 @@ export function Header() {
         onClick={handleToggleSidebar}
         aria-label={sidebarVisible ? "Hide sidebar" : "Show sidebar"}
       >
-        {!sidebarVisible ? <PanelLeft className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+        {sidebarVisible ? <ChevronLeft className="h-5 w-5" /> : <PanelLeft className="h-5 w-5" />}
       </Button>
       
       {/* Conditionally rendered sidebar */}

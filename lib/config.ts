@@ -7,7 +7,7 @@
 export const AI_QUIZ_BOT = {
   // The base URL for the AI quiz bot API
   // In production, this should be loaded from environment variables
-  BASE_URL: process.env.NEXT_PUBLIC_AI_QUIZ_BOT_URL || 'https://7100-34-125-133-151.ngrok-free.app/quiz',
+  BASE_URL: process.env.NEXT_PUBLIC_AI_QUIZ_BOT_URL || 'https://ae6d-35-223-227-18.ngrok-free.app/quiz',
   
   // Flag to control whether to use mock data instead of making API calls
   // Set to false to always try the API first

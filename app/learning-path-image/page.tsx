@@ -40,7 +40,7 @@ export default function LearningPathImagePage() {
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-center">
                 <div className="flex items-center justify-center gap-2">
-                  <Sparkles className="h-6 w-6 text-purple-400" />
+                  <Sparkles className="h-6 w-30 text-purple-400" />
                   <span>Learning Path Generator</span>
                 </div>
               </CardTitle>

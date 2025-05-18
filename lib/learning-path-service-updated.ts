@@ -188,7 +188,7 @@ function getMockLearningPath(topic: string): LearningPathStep[] {
 export async function fetchLearningPath(topic: string): Promise<LearningPathResponse | { isImage: true; imageUrl: string; topic: string }> {
   try {
     // The public URI of the AI bot
-    const apiUrl = `https://7100-34-125-133-151.ngrok-free.app/learning-path`;
+    const apiUrl = `https://ae6d-35-223-227-18.ngrok-free.app/learning-path`;
     
     // Since the API seems to be returning HTML or an image directly,
     // we'll use the URL directly as the image source with a query parameter

@@ -153,7 +153,7 @@ export async function fetchAIQuizQuestions(
     const normalizedScore = Math.max(0, Math.min(1, currentScore));
     
     // The public URI of the AI bot
-    const apiUrl = `https://ef68-34-125-133-151.ngrok-free.app/quiz`;
+    const apiUrl = `https://ae6d-35-223-227-18.ngrok-free.app/quiz`;
     
     // First try with POST and JSON body
     try {

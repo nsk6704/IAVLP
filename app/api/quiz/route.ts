@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Use the exact URL specified
-    const url = 'https://7100-34-125-133-151.ngrok-free.app/quiz';
+    const url = 'https://ae6d-35-223-227-18.ngrok-free.app/quiz';
     
     console.log(`Making direct POST request to: ${url}`);
     
