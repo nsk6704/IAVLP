@@ -2,7 +2,7 @@
 
 ## Overview
 
-IAVLP (Interactive Algorithm Visualization Learning Platform) is a comprehensive web application designed to help users understand complex algorithms and computational concepts through interactive visualizations. The platform provides step-by-step visual representations of various algorithms in computer science, making abstract concepts more accessible and engaging.
+Algoviz is a comprehensive web application designed to help users understand complex algorithms and computational concepts through interactive visualizations. The platform provides step-by-step visual representations of various algorithms in computer science, making abstract concepts more accessible and engaging.
 
 ## Features
 
