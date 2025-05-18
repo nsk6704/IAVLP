@@ -22,7 +22,9 @@ IAVLP (Interactive Algorithm Visualization Learning Platform) is a comprehensive
 
 - **Quick Sort**: Animated divide‑and‑conquer sorting with pivot selection and partition steps  
 - **Merge Sort**: Visualize recursive splitting and merging of subarrays  
-- **Heap Sort**: Interactive heap construction and extraction to demonstrate in‑place sorting  
+- **Heap Sort**: Interactive heap construction and extraction to demonstrate in‑place sorting
+- **Selection Sort**: Step‑by‑step selection and swapping of the minimum element in each pass
+- **Bubble Sort**: Animated pairwise comparisons and swaps to “bubble” the largest elements to the end   
 
 ### Theory of Computation
 
