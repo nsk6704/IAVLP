@@ -1,4 +1,4 @@
-# IAVLP - Interactive Algorithm Visualization Learning Platform
+# Algoviz - Interactive Algorithm Visualization Learning Platform
 
 ## Overview
 
